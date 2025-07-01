@@ -1,0 +1,177 @@
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <div class="cyber-bg"></div>
+
+  <div
+    class="post-header-3d"
+    style={"background-image: url('#{@post.header}'); background-size: cover;"}
+  >
+    <div class="header-overlay"></div>
+    <div class="post-header-content">
+      <div class="post-tags">
+        <%= for tag <- @post.tags do %>
+          <span class="neon-tag glow">{tag}</span>
+        <% end %>
+      </div>
+      <h1 class="post-title glitch" data-text={@post.title}>{@post.title}</h1>
+      <p class="post-description">
+        {if @post.description == "", do: "No description", else: @post.description}
+      </p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-4 gap-5">
+    <div class="cyber-sidebar">
+      <div class="cyber-card">
+        <div class="cyber-card-header">
+          <h3>POST INFO</h3>
+          <div class="cyber-line"></div>
+        </div>
+
+        <div class="post-meta-grid">
+          <div class="meta-item">
+            <div class="meta-icon">
+              <%= if is_nil(@user.profile_image) do %>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12a5 5 0 110-10 5 5 0 010 10zm0-2a3 3 0 100-6 3 3 0 000 6zm9 11a1 1 0 01-2 0v-2a3 3 0 00-3-3H8a3 3 0 00-3 3v2a1 1 0 01-2 0v-2a5 5 0 015-5h8a5 5 0 015 5v2z" />
+                </svg>
+              <% else %>
+                <img src={@user.profile_image} class="w-full h-full rounded-full" />
+              <% end %>
+            </div>
+            <div class="meta-content">
+              <span class="meta-label">Author</span>
+              <a href={"/user/#{@user.username}"} class="meta-value">{@user.username}</a>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <div class="meta-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17 3a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1h10zm-1 2H8v14h8V5zm-6 2h4v2h-4V7zm0 4h4v2h-4v-2z" />
+              </svg>
+            </div>
+            <div class="meta-content">
+              <span class="meta-label">Status</span>
+              <span class={"meta-value status-#{@post.status}"}>
+                {String.capitalize(to_string(@post.status))}
+              </span>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <div class="meta-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16zm1-8h4v2h-6V7h2v5z" />
+              </svg>
+            </div>
+            <div class="meta-content">
+              <span class="meta-label">Published</span>
+              <span class="meta-value">
+                <%= if @post.published_at do %>
+                  {Calendar.strftime(@post.published_at, "%d %b %Y")}
+                <% else %>
+                  Not published
+                <% end %>
+              </span>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <div class="meta-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 2a8 8 0 100 16 8 8 0 000-16zm0 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" />
+              </svg>
+            </div>
+            <div class="meta-content">
+              <span class="meta-label">Views</span>
+              <span class="meta-value">{@post.views_count}</span>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <div class="meta-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </div>
+            <div class="meta-content">
+              <span class="meta-label">Likes</span>
+              <span class="meta-value">{@post.likes_count}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cyber-card">
+        <div class="cyber-card-header">
+          <h3>ACTIONS</h3>
+          <div class="cyber-line"></div>
+        </div>
+
+        <div class="action-buttons">
+          <.link
+            :if={@current_user && @current_user.id == @post.author_id}
+            navigate={~p"/posts/#{@post.slug}/edit?return_to=show"}
+            class="cyber-alt-button space-x-2 items-center flex"
+          >
+            <.icon name="hero-pencil-square" /> <span class="pt-1">EDIT POST</span>
+          </.link>
+
+          <.button
+            phx-click={JS.push("like")}
+            phx-disable-with="Processing..."
+            class="cyber-button px-6 py-3 rounded-lg border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transition-colors w-full"
+            title={
+              if is_nil(@current_user),
+                do: "Sign in to like",
+                else: if(@has_liked, do: "Unlike", else: "Like")
+            }
+          >
+            <.icon name={if @has_liked, do: "hero-heart-solid", else: "hero-heart"} />
+            {if @has_liked, do: "UNLIKE", else: "LIKE"}
+            <span class="like-count">{@post.likes_count}</span>
+          </.button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-3">
+      <div class="cyber-content relation md:mt-0 mt-5 ">
+        <div class="content-animation">
+          <div class="post-content prose prose-lg dark:text-gray-300 prose-indigo max-w-none">
+            {raw(Helpers.to_html(@post.content))}
+          </div>
+        </div>
+
+        <div class="author-card mt-4">
+          <div class="author-avatar w-14 h-14">
+            <%= if is_nil(@user.profile_image) do %>
+              <div class="avatar-placeholder w-10 h-10">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12a5 5 0 110-10 5 5 0 010 10zm0-2a3 3 0 100-6 3 3 0 000 6zm9 11a1 1 0 01-2 0v-2a3 3 0 00-3-3H8a3 3 0 00-3 3v2a1 1 0 01-2 0v-2a5 5 0 015-5h8a5 5 0 015 5v2z" />
+                </svg>
+              </div>
+            <% else %>
+              <img src={@user.profile_image} class="w-10 h-10 rounded-full" />
+            <% end %>
+          </div>
+          <div class="author-info">
+            <h4>{@user.username}</h4>
+            <p class="text-xs">
+              {@user.bio || "Passionate about Elixir, Phoenix and cyberpunk aesthetics"}
+            </p>
+          </div>
+        </div>
+      </div>
+      <.live_component
+        module={ReddevsWeb.Components.Live.Comments}
+        id="comments"
+        resource={:post}
+        comment_resource={Reddevs.Posts.Comment}
+        domain={Reddevs.Posts}
+        item={@post}
+        current_user={@current_user}
+      />
+    </div>
+  </div>
+</Layouts.app>

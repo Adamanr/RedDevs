@@ -1,0 +1,206 @@
+<Layouts.app flash={@flash} current_user={@current_user}>
+  <div class="cyber-grid-bg fixed inset-0 -z-10">
+    <div class="grid-overlay"></div>
+    <div class="grid-scanline"></div>
+  </div>
+
+  <div class="cyber-terminal mx-auto mb-8">
+    <div class="terminal-header">
+      <div class="terminal-controls">
+        <span class="control close"></span>
+        <span class="control minimize"></span>
+        <span class="control expand"></span>
+      </div>
+      <div class="terminal-title">FILTER_PROTOCOL.EXE</div>
+    </div>
+
+    <div class="terminal-body">
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex gap-3">
+          <button class="cyber-button-small" phx-click="show_filter">
+            <.icon name="hero-adjustments-vertical" class="w-4 h-4" />
+            <span>{if @show_filter, do: "HIDE FILTERS", else: "SHOW FILTERS"}</span>
+          </button>
+          <button class="cyber-button-small" phx-click="reset_filters">
+            <.icon name="hero-arrow-path" class="w-4 h-4" />
+            <span>RESET</span>
+          </button>
+        </div>
+
+        <div class="system-status">
+          <div class="status-indicator active"></div>
+          <span class="status-text">SYSTEM_READY</span>
+        </div>
+      </div>
+
+      <div :if={@show_filter} class="filters-panel neon-box">
+        <.form for={} phx-change="apply_filters" phx-submit="apply_filters">
+          <div class="grid grid-cols-1 gap-4">
+            <div class="filter-group">
+              <div class="filter-label">
+                <span class="label-text">TITLE_SEARCH:</span>
+                <span class="label-icon">></span>
+              </div>
+              <input
+                type="text"
+                name="title"
+                placeholder="ENTER_KEYWORDS..."
+                value={@filters[:title] || ""}
+                class="cyber-input"
+                phx-debounce="300"
+              />
+            </div>
+
+            <div class="filter-group">
+              <div class="filter-label">
+                <span class="label-text">TAG_FILTER:</span>
+                <span class="label-icon">></span>
+              </div>
+              <.live_component
+                module={ReddevsWeb.Components.Live.Tags}
+                id="tag-input"
+                all_tags={@popular_tags}
+                initial_selected_tags={@filters[:tags] || []}
+                parent_pid={self()}
+                allow_new_tags={false}
+              />
+            </div>
+
+            <div class="filter-group">
+              <div class="filter-label">
+                <span class="label-text">TIME_RANGE:</span>
+                <span class="label-icon">></span>
+              </div>
+              <div class="grid grid-cols-2 gap-5 date-input-group">
+                <div class="date-input">
+                  <label>FROM:</label>
+                  <input
+                    type="datetime-local"
+                    name="from_date"
+                    value={@filters[:from_date] || ""}
+                    class="cyber-input"
+                    phx-debounce="300"
+                  />
+                </div>
+                <div class="date-input">
+                  <label>TO:</label>
+                  <input
+                    type="datetime-local"
+                    name="to_date"
+                    value={@filters[:to_date] || ""}
+                    class="cyber-input"
+                    phx-debounce="300"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </.form>
+      </div>
+    </div>
+  </div>
+
+  <div class="neon-feed mx-auto pb-10">
+    <%= if Enum.empty?(@streams.posts.inserts) do %>
+      <p class="text-cyan-300 text-center">No posts found with the current filters.</p>
+    <% else %>
+      <%= for {_id, post} <- @streams.posts do %>
+        <div
+          class="cyber-post-card"
+          data-status={post.status}
+          phx-click={JS.navigate(~p"/posts/#{post.slug}")}
+        >
+          <div class="post-header">
+            <div class="author-info flex">
+              <div class="avatar-container">
+                <%= if post.author.profile_image do %>
+                  <img
+                    src={post.author.profile_image}
+                    class="cyber-avatar"
+                    alt={post.author.username}
+                  />
+                <% else %>
+                  <div class="cyber-avatar-default">
+                    {String.at(post.author.username, 0) |> String.upcase()}
+                  </div>
+                <% end %>
+                <div class="online-indicator"></div>
+              </div>
+
+              <div class="author-details">
+                <div class="author-name">{post.author.username}</div>
+                <div class="post-time">
+                  {Timex.format!(post.inserted_at, "{D} {Mshort} {YYYY} в {h24}:{m}")}
+                  <span :if={post.status == :draft} class="draft-badge">DRAFT</span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              :if={not is_nil(@current_user) and @current_user.id == post.author_id}
+              class="post-actions"
+            >
+              <.link
+                patch={~p"/posts/#{post.slug}/edit"}
+                class="action-btn edit-btn"
+                phx-click={JS.push("edit", value: %{id: post.id})}
+              >
+                <.icon name="hero-pencil-square" class="w-4 h-4" />
+              </.link>
+              <.link
+                phx-click={JS.push("delete", value: %{id: post.id})}
+                data-confirm="Delete this post?"
+                class="action-btn delete-btn"
+              >
+                <.icon name="hero-trash" class="w-4 h-4" />
+              </.link>
+            </div>
+          </div>
+
+          <div class="post-content">
+            <h2 class="post-title glitch" data-text={post.title}>
+              {post.title}
+            </h2>
+
+            <p class="post-description">{post.description}</p>
+
+            <div :if={not is_nil(post.header)} class="post-image-container">
+              <img src={post.header} class="cyber-image" />
+              <div class="image-overlay-effects">
+                <div class="scanlines"></div>
+                <div class="glitch-overlay"></div>
+              </div>
+            </div>
+
+            <div :if={post.tags != []} class="tags-container">
+              <%= for tag <- post.tags do %>
+                <span class="neon-tag">#{tag}</span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="post-stats">
+            <div class="stat-item">
+              <.icon name="hero-eye" class="stat-icon" />
+              <span class="stat-count">{post.views_count}</span>
+            </div>
+            <div class="stat-item">
+              <.icon name="hero-chat-bubble-left" class="stat-icon" />
+              <span class="stat-count">{post.comments_count}</span>
+            </div>
+            <div class="stat-item">
+              <.icon name="hero-heart" class="stat-icon" />
+              <span class="stat-count">{post.likes_count}</span>
+            </div>
+          </div>
+
+          <div class="card-corner top-left"></div>
+          <div class="card-corner top-right"></div>
+          <div class="card-corner bottom-left"></div>
+          <div class="card-corner bottom-right"></div>
+          <div class="card-scanline"></div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</Layouts.app>

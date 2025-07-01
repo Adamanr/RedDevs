@@ -1,0 +1,273 @@
+<Layouts.app flash={@flash} current_user={@user}>
+  <div class="cyber-grid-bg fixed inset-0 -z-10">
+    <div class="grid-overlay"></div>
+    <div class="grid-scanline"></div>
+  </div>
+
+  <div class="">
+    <.form
+      for={@profile_form}
+      phx-change="validate_profile"
+      phx-submit="save_profile"
+      class="cyber-form"
+    >
+      <div class="cyber-section">
+        <h2 class="text-xl font-bold text-pink-500 mb-4">
+          <i class="fas fa-id-card mr-2"></i> DIGITAL IDENTITY
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <label class="cyber-label">
+              <i class="fas fa-user-astronaut mr-2"></i> NEURAL AVATAR
+            </label>
+
+            <div class="cyber-avatar-preview h-[50em]">
+              <img
+                src={@user.profile_image || "/images/default-avatar.png"}
+                class="glitch"
+                style="animation: glitch 3s infinite;"
+              />
+            </div>
+
+            <.input
+              field={@profile_form[:profile_image]}
+              label="PROFILE IMAGE URL"
+              type="text"
+              class="cyber-input"
+              placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+              value={@user.profile_image}
+            />
+          </div>
+
+          <div>
+            <label class="cyber-label">
+              <i class="fas fa-image mr-2"></i> COVER MATRIX
+            </label>
+
+            <div class="cyber-cover-preview">
+              <img src={@user.cover_image || "/images/default-cover.jpg"} class="opacity-70" />
+            </div>
+
+            <.input
+              field={@profile_form[:cover_image]}
+              label="COVER IMAGE URL"
+              type="text"
+              class="cyber-input"
+              placeholder="Enter cover image URL (e.g., https://example.com/cover.jpg)"
+              value={@user.cover_image}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="cyber-section">
+        <h2 class="text-xl font-bold text-green-500 mb-4">
+          <i class="fas fa-brain mr-2"></i> CORE IDENTITY PARAMETERS
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="cyber-input-group">
+            <.input
+              field={@profile_form[:name]}
+              label="USER NAME"
+              class="cyber-input"
+              placeholder="ENTER USER ID"
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@profile_form[:email]}
+              label="EMAIL"
+              class="cyber-input"
+              placeholder="ENTER USER ID"
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@profile_form[:pronouns]}
+              type="select"
+              options={[
+                {"SHE/HER", "she/her"},
+                {"HE/HIM", "he/him"},
+                {"ROBOT", "robot"}
+              ]}
+              label="DESIGNATION"
+              class="cyber-input"
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@profile_form[:username]}
+              label="USER IDENTIFIER"
+              class="cyber-input"
+              placeholder="ENTER USER ID"
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@profile_form[:location]}
+              label="GEO-LOCATION"
+              class="cyber-input"
+              placeholder="ENTER COORDINATES"
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@profile_form[:employer_name]}
+              label="CORPORATE AFFILIATION"
+              class="cyber-input"
+              placeholder="ENTER CORPORATION NAME"
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@profile_form[:website_url]}
+              label="PERSONAL NODE"
+              class="cyber-input"
+              placeholder="ENTER NODE URL"
+            />
+          </div>
+
+          <div class="md:col-span-2 cyber-input-group">
+            <.input
+              field={@profile_form[:bio]}
+              type="textarea"
+              label="NEURAL PROFILE DATA"
+              class="cyber-textarea"
+              placeholder="ENTER NEURAL PROFILE DATA"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="cyber-section">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h3 class="text-lg font-bold text-yellow-400 mb-4">
+              <i class="fas fa-code mr-2"></i> SKILL MATRIX
+            </h3>
+
+            <div class="cyber-input-group">
+              <label class="cyber-label">
+                <i class="fas fa-bolt mr-2"></i> CURRENTLY HACKING ON
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-purple-400 mb-4">
+              <i class="fas fa-cog mr-2 animate-spin"></i> SYSTEM CONFIGURATION
+            </h3>
+
+            <div class="cyber-input-group">
+              <.input
+                field={@profile_form[:theme]}
+                type="select"
+                options={[
+                  {"CYBERPUNK", "cyberpunk"},
+                  {"MATRIX", "matrix"},
+                  {"SYNTHWAVE", "synthwave"},
+                  {"DARK TERMINAL", "dark_terminal"}
+                ]}
+                label="INTERFACE THEME"
+                class="cyber-select"
+              />
+            </div>
+
+            <div class="cyber-input-group mt-4">
+              <.input
+                field={@profile_form[:preferred_language]}
+                type="select"
+                options={[
+                  {"ENGLISH", "en"},
+                  {"RUSSIAN", "ru"},
+                  {"JAPANESE", "ja"},
+                  {"CHINESE", "zh"}
+                ]}
+                label="SYSTEM LANGUAGE"
+                class="cyber-select"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cyber-actions">
+        <button type="submit" class="cyber-button-submit" phx-disable-with="SAVING TO DATABASE...">
+          <i class="fas fa-save mr-2"></i> SAVE CONFIGURATION
+        </button>
+
+        <.link navigate={~p"/user/#{@user.username}"} class="cyber-button-cancel">
+          <i class="fas fa-ban mr-2"></i> TERMINATE CHANGES
+        </.link>
+      </div>
+    </.form>
+
+    <Layouts.theme_toggle />
+
+    <div class="cyber-section mt-8">
+      <h2 class="text-xl font-bold text-green-500 mb-4">
+        <i class="fas fa-lock mr-2"></i> CHANGE ACCESS CREDENTIALS
+      </h2>
+
+      <.form
+        for={@password_form}
+        phx-change="validate_password"
+        phx-submit="save_password"
+        class="cyber-form"
+      >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="cyber-input-group md:col-span-2">
+            <.input
+              field={@password_form[:current_password]}
+              label="CURRENT PASSWORD"
+              type="password"
+              class="cyber-input"
+              placeholder="Enter current password"
+              required
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@password_form[:password]}
+              label="NEW PASSWORD"
+              type="password"
+              class="cyber-input"
+              placeholder="Enter new password (min 8 characters)"
+              required
+            />
+          </div>
+
+          <div class="cyber-input-group">
+            <.input
+              field={@password_form[:password_confirmation]}
+              label="CONFIRM NEW PASSWORD"
+              type="password"
+              class="cyber-input"
+              placeholder="Confirm new password"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="cyber-actions mt-4">
+          <button
+            type="submit"
+            class="cyber-button-submit"
+            phx-disable-with="UPDATING PASSWORD..."
+          >
+            <i class="fas fa-save mr-2"></i> UPDATE PASSWORD
+          </button>
+        </div>
+      </.form>
+    </div>
+  </div>
+</Layouts.app>

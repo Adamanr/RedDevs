@@ -1,0 +1,36 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Фон -->
+  <rect width="200" height="200" rx="45" fill="#0d0d1a"/>
+
+  <!-- Неоновый текст "RD" -->
+  <text x="50" y="130" font-family="Orbitron, sans-serif" font-size="80" fill="none" stroke="#00ffea" stroke-width="2" filter="url(#glow)">
+    RD
+  </text>
+
+  <!-- Glitch-эффект -->
+  <text x="52" y="132" font-family="Orbitron, sans-serif" font-size="80" fill="none" stroke="#ff00ff" stroke-width="1" opacity="0.5">
+    RD
+  </text>
+  <text x="48" y="128" font-family="Orbitron, sans-serif" font-size="80" fill="none" stroke="#ff00ff" stroke-width="1" opacity="0.3">
+    RD
+  </text>
+
+  <!-- Технологические линии -->
+  <line x1="20" y1="150" x2="180" y2="150" stroke="#00ffea" stroke-width="1" opacity="0.6"/>
+  <line x1="20" y1="155" x2="180" y2="155" stroke="#ff00ff" stroke-width="1" opacity="0.4"/>
+
+  <!-- Декоративные элементы (технологические точки) -->
+  <circle cx="30" cy="30" r="4" fill="#00ffea" filter="url(#glow)"/>
+  <circle cx="170" cy="170" r="4" fill="#ff00ff" filter="url(#glow)"/>
+
+  <!-- Неоновое свечение -->
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
